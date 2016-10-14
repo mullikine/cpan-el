@@ -8,9 +8,10 @@
 
 ;; Commentary:
 
-;; This code was modified from the built-in shell.el.  There is
-;; probably a lot more work needed to get this up to snuff, but it
-;; basically "works" on Windows, and "should" work on Linux/Mac.
+;; This code is based on the built-in `shell.el'.  There is probably
+;; more work needed to get this up to snuff (completion? syntax
+;; highlighting?), but it works.  It even "works" on Windows (modulo
+;; bugs in the way the prompt is displayed).
 
 ;; To use it, run `M-x cpan`
 
