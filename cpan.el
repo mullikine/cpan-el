@@ -1,4 +1,4 @@
-;;; cpan.el -- Drive CPAN from Emacs
+;;; cpan.el -- Drive Perl's CPAN shell from Emacs
 
 ;; Copyright (c) 2016, Richard Loveland
 
