@@ -6,7 +6,7 @@
 
 ;; This file is NOT part of GNU Emacs.
 
-;; Commentary:
+;;; Commentary:
 
 ;; This code is based on the built-in `shell.el'.  There is probably
 ;; more work needed to get this up to snuff (completion? syntax
@@ -15,6 +15,8 @@
 
 ;; To use it, run `M-x cpan`
 
+;;; Code:
+
 (require 'comint)
 
 (defgroup cpan nil
@@ -22,11 +24,11 @@
   :group 'processes)
 
 (defcustom cpan-prompt-pattern "cpan\> "
-  ""
+  "Regular expression that matches the CPAN shell prompt."
   :type 'regexp
   :group 'cpan)
 
-(defvar cpan-file-name "cpan")
+(defvar cpan-file-name "cpan" "File name to use for the CPAN client.")
 
 (defvar cpan-mode-map
   (let ((map (nconc (make-sparse-keymap) comint-mode-map)))
@@ -51,7 +53,7 @@
   :group 'cpan)
 
 (define-derived-mode cpan-mode comint-mode "CPAN"
-  ""
+  "Major mode for interacting with an inferior CPAN shell."
   (setq comint-prompt-regexp cpan-prompt-pattern)
   (set (make-local-variable 'paragraph-separate) "\\'")
   (set (make-local-variable 'paragraph-start) comint-prompt-regexp)
@@ -75,13 +77,13 @@ Sentinels will always get the two parameters PROCESS and EVENT."
 
 ;;;###autoload
 (defun cpan (&optional buffer)
-  "Run an inferior cpan, with I/O through BUFFER (which defaults to `*cpan*').
+  "Run an inferior CPAN shell, with I/O through BUFFER (defaults to `*cpan*').
 Interactively, a prefix arg means to prompt for BUFFER.
 If `default-directory' is a remote file name, it is also prompted
 to change if called with a prefix arg.
 
-If BUFFER exists but cpan process is not running, make new cpan.
-If BUFFER exists and cpan process is running, just switch to BUFFER.
+If BUFFER exists but CPAN process is not running, open new CPAN shell.
+If BUFFER exists and CPAN process is running, just switch to BUFFER.
 
 Program used comes from variable `explicit-cpan-file-name',
 or (if that is nil) from `cpan-file-name'.
@@ -94,23 +96,23 @@ See also the variable `cpan-prompt-pattern'.
   (interactive
    (list
     (and current-prefix-arg
-	 (prog1
-	     (read-buffer "CPAN buffer: "
-			  ;; If the current buffer is an inactive
-			  ;; CPAN buffer, use it as the default.
-			  (if (and (eq major-mode 'cpan-mode)
-				   (null (get-buffer-process (current-buffer))))
-			      (buffer-name)
-			    (generate-new-buffer-name "*cpan*")))
-	   (if (file-remote-p default-directory)
-	       ;; It must be possible to declare a local default-directory.
-           ;; FIXME: This can't be right: it changes the default-directory
-           ;; of the current-buffer rather than of the *cpan* buffer.
-	       (setq default-directory
-		     (expand-file-name
-		      (read-directory-name
-		       "Default directory: " default-directory default-directory
-		       t nil))))))))
+         (prog1
+             (read-buffer "CPAN buffer: "
+                          ;; If the current buffer is an inactive
+                          ;; CPAN buffer, use it as the default.
+                          (if (and (eq major-mode 'cpan-mode)
+                                   (null (get-buffer-process (current-buffer))))
+                              (buffer-name)
+                            (generate-new-buffer-name "*cpan*")))
+           (if (file-remote-p default-directory)
+               ;; It must be possible to declare a local default-directory.
+               ;; FIXME: This can't be right: it changes the default-directory
+               ;; of the current-buffer rather than of the *cpan* buffer.
+               (setq default-directory
+                     (expand-file-name
+                      (read-directory-name
+                       "Default directory: " default-directory default-directory
+                       t nil))))))))
   (setq buffer (if (or buffer (not (derived-mode-p 'cpan-mode))
                        (comint-check-proc (current-buffer)))
                    (get-buffer-create (or buffer "*cpan*"))
@@ -128,7 +130,11 @@ See also the variable `cpan-prompt-pattern'.
             ;; avoid using the cmdproxy.exe that ships with Emacs,
             ;; since it breaks the `cpan` command.
             (if (eq system-type 'windows-nt)
-                (mapcar (lambda (x) (if (string-match-p "^SHELL=C:" x) "SHELL=C:\\WINDOWS\\system32\\cmd.exe" x)) process-environment)
+                (mapcar (lambda (x)
+                          (if (string-match-p "^SHELL=C:" x)
+                              "SHELL=C:\\WINDOWS\\system32\\cmd.exe"
+                            x))
+                        process-environment)
               process-environment)))
       (make-comint-in-buffer "cpan" buffer prog)
       (cpan-mode)))
