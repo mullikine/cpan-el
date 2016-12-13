@@ -17,6 +17,15 @@ The CPAN shell is just another shell, so why not drive it from Emacs?
 
 Start it with `M-x cpan`.
 
+## About
+
+This code is a modified version of the built-in `shell.el`.  There is
+probably more work needed to get this up to snuff (completion? syntax
+highlighting?), but it works.  It even "works" on Windows (modulo bugs
+in the way the prompt is displayed, for reasons that are unclear to
+me).
+
 ## License
 
-See the file `COPYING` in this directory.
+See the file `COPYING` in this directory.  Since it's a modified
+version of `shell.el`, we use GPLv3.
